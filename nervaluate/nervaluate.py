@@ -4,6 +4,8 @@
 import logging
 from copy import deepcopy
 
+from .utils import conll_to_spans, find_overlap, list_to_spans
+
 logging.basicConfig(
     format="%(asctime)s %(name)s %(levelname)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
@@ -12,7 +14,7 @@ logging.basicConfig(
 
 class Evaluator():
 
-    def __init__(self, true, pred, tags, list=False):
+    def __init__(self, true, pred, tags, format="prodigy"):
         """
         """
 
@@ -51,6 +53,13 @@ class Evaluator():
 
         self.evaluation_agg_entities_type = {e: deepcopy(self.results) for e in tags}
 
+        loader = {
+            "list": list_to_spans,
+            "conll": conll_to_spans,
+        }
+
+        self.loader = loader["format"]
+
 
     def evaluate(self):
 
@@ -59,22 +68,10 @@ class Evaluator():
             len(self.pred), len(self.true)
         )
 
-        for true_ents, pred_ents in zip(self.true, self.pred):
+        pred = self.loader(self.pred)
+        true = self.loader(self.true)
 
-            if self.list:
-
-            # If entities passed as list, collect these into json format
-
-            # If recieving a list of entities, check that the length of the
-            # true and predicted examples are the same. This must be checked
-            # here, because another error may not be thrown if the lengths do
-            # not match.
-
-                if len(true_ents) != len(pred_ents):
-                    raise ValueError("Prediction length does not match true example length")
-
-                true_ents = collect_named_entities(true_ents)
-                pred_ents = collect_named_entities(pred_ents)
+        for true_ents, pred_ents in zip(true, pred):
 
             # Compute results for one message
 
@@ -115,7 +112,7 @@ class Evaluator():
 
 def collect_named_entities(tokens):
     """
-    Creates a list of Entity named-tuples, storing the entity type and the 
+    Creates a list of Entity named-tuples, storing the entity type and the
     start and end offsets of the entity.
 
     :param tokens: a list of tags
@@ -165,14 +162,14 @@ def compute_metrics(true_named_entities, pred_named_entities, tags):
 
     :true_name_entitites: Collected true named entities output by collect_named_entities
     :pred_name_entitites:  Collected predicted named entities output by collect_named_entities
-    :tags: List of tags to be used 
+    :tags: List of tags to be used
     """
 
 
     eval_metrics = {'correct': 0, 'incorrect': 0, 'partial': 0, 'missed': 0, 'spurious': 0, 'precision': 0, 'recall': 0}
 
     # overall results
-    
+
     evaluation = {
         'strict': deepcopy(eval_metrics),
         'ent_type': deepcopy(eval_metrics),
@@ -328,7 +325,7 @@ def compute_metrics(true_named_entities, pred_named_entities, tags):
                 # found in this example. This will mean that the sum of the
                 # evaluation_agg_entities will not equal evaluation.
 
-                for true in tags:                    
+                for true in tags:
 
                     evaluation_agg_entities_type[true]['strict']['spurious'] += 1
                     evaluation_agg_entities_type[true]['ent_type']['spurious'] += 1
@@ -374,29 +371,6 @@ def compute_metrics(true_named_entities, pred_named_entities, tags):
             )
 
     return evaluation, evaluation_agg_entities_type
-
-
-def find_overlap(true_range, pred_range):
-    """Find the overlap between two ranges
-
-    Find the overlap between two ranges. Return the overlapping values if
-    present, else return an empty set().
-
-    Examples:
-
-    >>> find_overlap((1, 2), (2, 3))
-    2
-    >>> find_overlap((1, 2), (3, 4))
-    set()
-    """
-
-    true_set = set(true_range)
-    pred_set = set(pred_range)
-
-    overlaps = true_set.intersection(pred_set)
-
-    return overlaps
-
 
 def compute_actual_possible(results):
     """
@@ -471,4 +445,3 @@ def compute_precision_recall_wrapper(results):
     results = {**results_a, **results_b}
 
     return results
-
