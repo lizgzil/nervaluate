@@ -8,22 +8,16 @@ from nervaluate import Evaluator
 
 def test_evaluator_simple_case():
 
-    true = [
-        [{"label": "PER", "start": 2, "end": 4}],
-        [{"label": "LOC", "start": 1, "end": 2},
-         {"label": "LOC", "start": 3, "end": 4}]
-    ]
+    true = "word\tO\nword\tO\B-PER\nword\tI-PER\nword\tO\n\nword\tO\nword\tB-LOC\nword\tI-LOC\nword\tB-LOC\nword\tI-LOC\nword\tO\n"
 
-    pred = [
-        [{"label": "PER", "start": 2, "end": 4}],
-        [{"label": "LOC", "start": 1, "end": 2},
-         {"label": "LOC", "start": 3, "end": 4}]
-    ]
+    pred = "word\tO\nword\tO\B-PER\nword\tI-PER\nword\tO\n\nword\tO\nword\tB-LOC\nword\tI-LOC\nword\tB-LOC\nword\tI-LOC\nword\tO\n"
 
-    evaluator = Evaluator(true, pred, tags=['LOC', 'PER'])
+    evaluator = Evaluator(true, pred, tags=['LOC', 'PER'], loader="list")
 
     results, results_agg = evaluator.evaluate()
 
+    print(evaluator.pred)
+    print(evaluator.true)
     expected = {
         'strict': {
             'correct': 3,
@@ -83,18 +77,18 @@ def test_evaluator_simple_case_filtered_tags():
     """
 
     true = [
-        [{"label": "PER", "start": 2, "end": 4}],
-        [{"label": "LOC", "start": 1, "end": 2},
-         {"label": "LOC", "start": 3, "end": 4}]
+        ['O', 'O', 'B-PER', 'I-PER', 'O'],
+        ['O', 'B-LOC', 'I-LOC', 'B-LOC', 'I-LOC', 'O'],
+        ['O', 'B-MISC', 'I-MISC', 'O', 'O', 'O'],
     ]
 
     pred = [
-        [{"label": "PER", "start": 2, "end": 4}],
-        [{"label": "LOC", "start": 1, "end": 2},
-         {"label": "LOC", "start": 3, "end": 4}]
+        ['O', 'O', 'B-PER', 'I-PER', 'O'],
+        ['O', 'B-LOC', 'I-LOC', 'B-LOC', 'I-LOC', 'O'],
+        ['O', 'B-MISC', 'I-MISC', 'O', 'O', 'O'],
     ]
 
-    evaluator = Evaluator(true, pred, tags=['PER', 'LOC'])
+    evaluator = Evaluator(true, pred, tags=['PER', 'LOC'], loader="list")
 
     results, results_agg = evaluator.evaluate()
 
@@ -157,14 +151,14 @@ def test_evaluator_extra_classes():
     """
 
     true = [
-        [{"label": "ORG", "start": 1, "end": 3}],
+        ['O', 'B-ORG', 'I-ORG', 'I-ORG', 'O', 'O'],
     ]
 
     pred = [
-        [{"label": "FOO", "start": 1, "end": 3}],
+        ['O', 'B-FOO', 'I-FOO', 'I-FOO', 'O', 'O'],
     ]
 
-    evaluator = Evaluator(true, pred, tags=['ORG', 'FOO'])
+    evaluator = Evaluator(true, pred, tags=['ORG', 'FOO'], loader="list")
 
     results, results_agg = evaluator.evaluate()
 
@@ -226,14 +220,14 @@ def test_evaluator_no_entities_in_prediction():
     """
 
     true = [
-        [{"label": "PER", "start": 2, "end": 4}],
+        ['O', 'O', 'B-PER', 'I-PER', 'O', 'O'],
     ]
 
     pred = [
-        [],
+        ['O', 'O', 'O', 'O', 'O', 'O'],
     ]
 
-    evaluator = Evaluator(true, pred, tags=['PER'])
+    evaluator = Evaluator(true, pred, tags=['PER'], loader="list")
 
     results, results_agg = evaluator.evaluate()
 
@@ -295,14 +289,14 @@ def test_evaluator_compare_results_and_results_agg():
     """
 
     true = [
-        [{"label": "PER", "start": 2, "end": 4}],
+        ['O', 'O', 'B-PER', 'I-PER', 'O', 'O'],
     ]
 
     pred = [
-        [{"label": "PER", "start": 2, "end": 4}],
+        ['O', 'O', 'B-PER', 'I-PER', 'O', 'O'],
     ]
 
-    evaluator = Evaluator(true, pred, tags=['PER'])
+    evaluator = Evaluator(true, pred, tags=['PER'], loader="list")
 
     results, results_agg = evaluator.evaluate()
 
@@ -423,18 +417,18 @@ def test_evaluator_compare_results_and_results_agg_1():
     """
 
     true = [
-        [],
-        [{"label": "ORG", "start": 2, "end": 4}],
-        [{"label": "MISC", "start": 2, "end": 4}],
+        ['O', 'O', 'O', 'O', 'O', 'O'],
+        ['O', 'O', 'B-ORG', 'I-ORG', 'O', 'O'],
+        ['O', 'O', 'B-MISC', 'I-MISC', 'O', 'O'],
     ]
 
     pred = [
-        [{"label": "PER", "start": 2, "end": 4}],
-        [{"label": "ORG", "start": 2, "end": 4}],
-        [{"label": "MISC", "start": 2, "end": 4}]
+        ['O', 'O', 'B-PER', 'I-PER', 'O', 'O'],
+        ['O', 'O', 'B-ORG', 'I-ORG', 'O', 'O'],
+        ['O', 'O', 'B-MISC', 'I-MISC', 'O', 'O'],
     ]
 
-    evaluator = Evaluator(true, pred, tags=['PER', 'ORG', 'MISC'])
+    evaluator = Evaluator(true, pred, tags=['PER', 'ORG', 'MISC'], loader="list")
 
     results, results_agg = evaluator.evaluate()
 
@@ -594,4 +588,34 @@ def test_evaluator_compare_results_and_results_agg_1():
     assert results['ent_type'] == expected['ent_type']
     assert results['partial'] == expected['partial']
     assert results['exact'] == expected['exact']
+
+@pytest.mark.xfail(strict=True)
+def test_evaluator_wrong_prediction_length():
+
+    true = [
+        ['O', 'B-ORG', 'I-ORG', 'O', 'O'],
+    ]
+
+    pred = [
+        ['O', 'B-MISC', 'I-MISC', 'O'],
+    ]
+
+    evaluator = Evaluator(true, pred, tags=['PER', 'MISC'], loader="list")
+
+    with pytest.raises(ValueError):
+        evaluator.evaluate()
+
+def test_evaluator_non_matching_corpus_length():
+
+    true = [
+        ['O', 'B-ORG', 'I-ORG', 'O', 'O'],
+        ['O', 'O', 'O', 'O']
+    ]
+
+    pred = [
+        ['O', 'B-MISC', 'I-MISC', 'O'],
+    ]
+
+    with pytest.raises(ValueError):
+        evaluator = Evaluator(true, pred, tags=['PER', 'MISC'], loader="list")
 

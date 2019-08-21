@@ -14,7 +14,7 @@ logging.basicConfig(
 
 class Evaluator():
 
-    def __init__(self, true, pred, tags, format="prodigy"):
+    def __init__(self, true, pred, tags, loader=None):
         """
         """
 
@@ -53,12 +53,12 @@ class Evaluator():
 
         self.evaluation_agg_entities_type = {e: deepcopy(self.results) for e in tags}
 
-        loader = {
+        self.loaders = {
             "list": list_to_spans,
             "conll": conll_to_spans,
         }
 
-        self.loader = loader["format"]
+        self.loader = loader
 
 
     def evaluate(self):
@@ -68,10 +68,13 @@ class Evaluator():
             len(self.pred), len(self.true)
         )
 
-        pred = self.loader(self.pred)
-        true = self.loader(self.true)
+        if self.loader:
+            loader = self.loaders[self.loader]
 
-        for true_ents, pred_ents in zip(true, pred):
+            self.pred = loader(self.pred)
+            self.true = loader(self.true)
+
+        for true_ents, pred_ents in zip(self.true, self.pred):
 
             # Compute results for one message
 
