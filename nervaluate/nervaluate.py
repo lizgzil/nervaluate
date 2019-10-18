@@ -112,7 +112,7 @@ class Evaluator():
 
 def collect_named_entities(tokens):
     """
-    Creates a list of Entity named-tuples, storing the entity type and the 
+    Creates a list of Entity named-tuples, storing the entity type and the
     start and end offsets of the entity.
 
     :param tokens: a list of tags
@@ -162,14 +162,14 @@ def compute_metrics(true_named_entities, pred_named_entities, tags):
 
     :true_name_entitites: Collected true named entities output by collect_named_entities
     :pred_name_entitites:  Collected predicted named entities output by collect_named_entities
-    :tags: List of tags to be used 
+    :tags: List of tags to be used
     """
 
 
     eval_metrics = {'correct': 0, 'incorrect': 0, 'partial': 0, 'missed': 0, 'spurious': 0, 'precision': 0, 'recall': 0}
 
     # overall results
-    
+
     evaluation = {
         'strict': deepcopy(eval_metrics),
         'ent_type': deepcopy(eval_metrics),
@@ -325,7 +325,7 @@ def compute_metrics(true_named_entities, pred_named_entities, tags):
                 # found in this example. This will mean that the sum of the
                 # evaluation_agg_entities will not equal evaluation.
 
-                for true in tags:                    
+                for true in tags:
 
                     evaluation_agg_entities_type[true]['strict']['spurious'] += 1
                     evaluation_agg_entities_type[true]['ent_type']['spurious'] += 1
@@ -468,4 +468,3 @@ def compute_precision_recall_wrapper(results):
     results = {**results_a, **results_b}
 
     return results
-
