@@ -12,12 +12,10 @@ def test_evaluator_simple_case():
 
     pred = "word\tO\nword\tO\B-PER\nword\tI-PER\nword\tO\n\nword\tO\nword\tB-LOC\nword\tI-LOC\nword\tB-LOC\nword\tI-LOC\nword\tO\n"
 
-    evaluator = Evaluator(true, pred, tags=['LOC', 'PER'], loader="list")
+    evaluator = Evaluator(true, pred, tags=['LOC', 'PER'], loader="conll")
 
     results, results_agg = evaluator.evaluate()
 
-    print(evaluator.pred)
-    print(evaluator.true)
     expected = {
         'strict': {
             'correct': 3,
@@ -70,25 +68,18 @@ def test_evaluator_simple_case():
     assert results['partial'] == expected['partial']
     assert results['exact'] == expected['exact']
 
-def test_evaluator_simple_case_filtered_tags():
+
+def test_evaluator_conll_simple_case_filtered_tags():
     """
     Check that tags can be exluded by passing the tags argument
 
     """
 
-    true = [
-        ['O', 'O', 'B-PER', 'I-PER', 'O'],
-        ['O', 'B-LOC', 'I-LOC', 'B-LOC', 'I-LOC', 'O'],
-        ['O', 'B-MISC', 'I-MISC', 'O', 'O', 'O'],
-    ]
+    true = "word\tO\nword\tO\B-PER\nword\tI-PER\nword\tO\n\nword\tO\nword\tB-LOC\nword\tI-LOC\nword\tB-LOC\nword\tI-LOC\nword\tO\n"
 
-    pred = [
-        ['O', 'O', 'B-PER', 'I-PER', 'O'],
-        ['O', 'B-LOC', 'I-LOC', 'B-LOC', 'I-LOC', 'O'],
-        ['O', 'B-MISC', 'I-MISC', 'O', 'O', 'O'],
-    ]
+    pred = "word\tO\nword\tO\B-PER\nword\tI-PER\nword\tO\n\nword\tO\nword\tB-LOC\nword\tI-LOC\nword\tB-LOC\nword\tI-LOC\nword\tO\n"
 
-    evaluator = Evaluator(true, pred, tags=['PER', 'LOC'], loader="list")
+    evaluator = Evaluator(true, pred, tags=['PER', 'LOC'], loader="conll")
 
     results, results_agg = evaluator.evaluate()
 
@@ -145,20 +136,15 @@ def test_evaluator_simple_case_filtered_tags():
     assert results['exact'] == expected['exact']
 
 
-def test_evaluator_extra_classes():
+def test_evaluator_conll_extra_classes():
     """
     Case when model predicts a class that is not in the gold (true) data
     """
 
-    true = [
-        ['O', 'B-ORG', 'I-ORG', 'I-ORG', 'O', 'O'],
-    ]
+    true = "word\tO\nword\tB-ORG\nword\tI-ORG\nword\tI-ORG\nword\tO\nword\tO"
+    pred = "word\tO\nword\tB-FOO\nword\tI-FOO\nword\tI-FOO\nword\tO\nword\tO"
 
-    pred = [
-        ['O', 'B-FOO', 'I-FOO', 'I-FOO', 'O', 'O'],
-    ]
-
-    evaluator = Evaluator(true, pred, tags=['ORG', 'FOO'], loader="list")
+    evaluator = Evaluator(true, pred, tags=['ORG', 'FOO'], loader="conll")
 
     results, results_agg = evaluator.evaluate()
 
@@ -214,20 +200,15 @@ def test_evaluator_extra_classes():
     assert results['partial'] == expected['partial']
     assert results['exact'] == expected['exact']
 
-def test_evaluator_no_entities_in_prediction():
+def test_evaluator_conll_no_entities_in_prediction():
     """
     Case when model predicts a class that is not in the gold (true) data
     """
 
-    true = [
-        ['O', 'O', 'B-PER', 'I-PER', 'O', 'O'],
-    ]
+    true = "word\tO\nword\tO\nword\tB-PER\nword\tI-PER\nword\tO\nword\tO"
+    pred = "word\tO\nword\tO\nword\tO\nword\tO\nword\tO\nword\tO"
 
-    pred = [
-        ['O', 'O', 'O', 'O', 'O', 'O'],
-    ]
-
-    evaluator = Evaluator(true, pred, tags=['PER'], loader="list")
+    evaluator = Evaluator(true, pred, tags=['PER'], loader="conll")
 
     results, results_agg = evaluator.evaluate()
 
@@ -288,15 +269,10 @@ def test_evaluator_compare_results_and_results_agg():
     Check that the label level results match the total results.
     """
 
-    true = [
-        ['O', 'O', 'B-PER', 'I-PER', 'O', 'O'],
-    ]
+    true = "word\tO\nword\tO\nword\tB-PER\nword\tI-PER\nword\tO\nword\tO"
+    pred = "word\tO\nword\tO\nword\tB-PER\nword\tI-PER\nword\tO\nword\tO"
 
-    pred = [
-        ['O', 'O', 'B-PER', 'I-PER', 'O', 'O'],
-    ]
-
-    evaluator = Evaluator(true, pred, tags=['PER'], loader="list")
+    evaluator = Evaluator(true, pred, tags=['PER'], loader="conll")
 
     results, results_agg = evaluator.evaluate()
 
@@ -416,19 +392,21 @@ def test_evaluator_compare_results_and_results_agg_1():
     Test case when model predicts a label not in the test data.
     """
 
-    true = [
-        ['O', 'O', 'O', 'O', 'O', 'O'],
-        ['O', 'O', 'B-ORG', 'I-ORG', 'O', 'O'],
-        ['O', 'O', 'B-MISC', 'I-MISC', 'O', 'O'],
-    ]
+    true = (
+        "word\tO\nword\tO\nword\tO\nword\tO\nword\tO\nword\tO\n\n"
+        "word\tO\nword\tO\nword\tB-ORG \nword\tI-ORG \nword\tO\nword\tO\n\n"
+        "word\tO\nword\tO\nword\tB-MISC\nword\tI-MISC\nword\tO\nword\tO\n\n"
+    )
 
-    pred = [
-        ['O', 'O', 'B-PER', 'I-PER', 'O', 'O'],
-        ['O', 'O', 'B-ORG', 'I-ORG', 'O', 'O'],
-        ['O', 'O', 'B-MISC', 'I-MISC', 'O', 'O'],
-    ]
+    pred = (
+        "word\tO\nword\tO\nword\tB-PER\nword\tI-PER\nword\tO\nword\tO\n\n"
+        "word\tO\nword\tO\nword\tB-ORG \nword\tI-ORG \nword\tO\nword\tO\n\n"
+        "word\tO\nword\tO\nword\tB-MISC\nword\tI-MISC\nword\tO\nword\tO\n\n"
+    )
 
-    evaluator = Evaluator(true, pred, tags=['PER', 'ORG', 'MISC'], loader="list")
+    evaluator = Evaluator(true, pred, tags=['PER', 'ORG', 'MISC'], loader="conll")
+    print(evaluator.pred)
+    print(evaluator.true)
 
     results, results_agg = evaluator.evaluate()
 
@@ -589,33 +567,33 @@ def test_evaluator_compare_results_and_results_agg_1():
     assert results['partial'] == expected['partial']
     assert results['exact'] == expected['exact']
 
-@pytest.mark.xfail(strict=True)
-def test_evaluator_wrong_prediction_length():
-
-    true = [
-        ['O', 'B-ORG', 'I-ORG', 'O', 'O'],
-    ]
-
-    pred = [
-        ['O', 'B-MISC', 'I-MISC', 'O'],
-    ]
-
-    evaluator = Evaluator(true, pred, tags=['PER', 'MISC'], loader="list")
-
-    with pytest.raises(ValueError):
-        evaluator.evaluate()
-
-def test_evaluator_non_matching_corpus_length():
-
-    true = [
-        ['O', 'B-ORG', 'I-ORG', 'O', 'O'],
-        ['O', 'O', 'O', 'O']
-    ]
-
-    pred = [
-        ['O', 'B-MISC', 'I-MISC', 'O'],
-    ]
-
-    with pytest.raises(ValueError):
-        evaluator = Evaluator(true, pred, tags=['PER', 'MISC'], loader="list")
-
+#@pytest.mark.xfail(strict=True)
+#def test_evaluator_wrong_prediction_length():
+#
+#    true = [
+#        ['O', 'B-ORG', 'I-ORG', 'O', 'O'],
+#    ]
+#
+#    pred = [
+#        ['O', 'B-MISC', 'I-MISC', 'O'],
+#    ]
+#
+#    evaluator = Evaluator(true, pred, tags=['PER', 'MISC'], loader="list")
+#
+#    with pytest.raises(ValueError):
+#        evaluator.evaluate()
+#
+#def test_evaluator_non_matching_corpus_length():
+#
+#    true = [
+#        ['O', 'B-ORG', 'I-ORG', 'O', 'O'],
+#        ['O', 'O', 'O', 'O']
+#    ]
+#
+#    pred = [
+#        ['O', 'B-MISC', 'I-MISC', 'O'],
+#    ]
+#
+#    with pytest.raises(ValueError):
+#        evaluator = Evaluator(true, pred, tags=['PER', 'MISC'], loader="list")
+#
