@@ -9,7 +9,7 @@ from .utils import conll_to_spans, find_overlap, list_to_spans
 logging.basicConfig(
     format="%(asctime)s %(name)s %(levelname)s: %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
-    level="DEBUG",
+    level="INFO",
 )
 
 class Evaluator():
@@ -60,7 +60,7 @@ class Evaluator():
 
     def evaluate(self):
 
-        logging.info(
+        logging.debug(
             "Imported %s predictions for %s true examples",
             len(self.pred), len(self.true)
         )
