@@ -18,9 +18,6 @@ class Evaluator():
         """
         """
 
-        if len(true) != len(pred):
-            raise ValueError("Number of predicted documents does not equal true")
-
         self.true = true
         self.pred = pred
         self.tags = tags
@@ -73,6 +70,14 @@ class Evaluator():
 
             self.pred = loader(self.pred)
             self.true = loader(self.true)
+
+            # Check that something got loaded
+
+            len_pred = len([pred for pred in self.pred if pred])
+            len_true = len([true for true in self.true if true])
+
+        if len(self.true) != len(self.pred):
+            raise ValueError("Number of predicted documents does not equal true")
 
         for true_ents, pred_ents in zip(self.true, self.pred):
 
