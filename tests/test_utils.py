@@ -2,7 +2,6 @@
 # coding: utf-8
 
 import pytest
-
 from nervaluate import (collect_named_entities, conll_to_spans, find_overlap,
                         split_list)
 
@@ -36,7 +35,14 @@ def test_conll_to_spans():
         "foo\tO\n"
     )
 
-    after = [[{'label': 'PER', 'start': 1, 'end': 1}, {'label': 'PER', 'start': 4, 'end': 4},{'label': 'PER', 'start': 6, 'end': 6}], []]
+    after = [
+        [
+            {'label': 'PER', 'start': 1, 'end': 1},
+            {'label': 'PER', 'start': 4, 'end': 4},
+            {'label': 'PER', 'start': 6, 'end': 6},
+        ],
+        []
+    ]
 
     out = conll_to_spans(before)
 
