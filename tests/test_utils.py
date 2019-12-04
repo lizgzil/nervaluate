@@ -104,7 +104,7 @@ def test_find_overlap_total_overlap():
 
 def test_find_overlap_start_overlap():
 
-    pred_entity = {"label":"LOC", "start": 5,  "end": 12}
+    pred_entity = {"label":"LOC", "start": 5, "end": 12}
     true_entity = {"label":"LOC", "start": 11, "end": 20}
 
     pred_range = range(pred_entity["start"], pred_entity["end"])
